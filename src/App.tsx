@@ -19,7 +19,7 @@ const App: React.FC = () => {
       return;
     }
 
-    const apiUrl = "https://your-api-gateway-endpoint"; // Replace with your API Gateway endpoint
+    const apiUrl = "https://fc3c66et9b.execute-api.ap-south-1.amazonaws.com/default/rajantestfunction // Replace with your API Gateway endpoint
 
     try {
       setUploadStatus("Uploading...");
