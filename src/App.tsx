@@ -3,7 +3,6 @@ import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import "./App.css"; // Optional: Add your own styles if needed
 
-//nothing
 const App: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadMessage, setUploadMessage] = useState<string | null>(null);
@@ -23,7 +22,7 @@ const App: React.FC = () => {
 
     try {
       const response = await fetch(
-        "https://octr9wrn0k.execute-api.ap-south-1.amazonaws.com/s2/rajantestfunction", // Replace with your Lambda endpoint
+        "https://your-lambda-function-endpoint", // Replace with your Lambda endpoint
         {
           method: "POST",
           headers: {
@@ -46,10 +45,7 @@ const App: React.FC = () => {
   };
 
   const isDateMarked = (date: Date): boolean => {
-    return (
-      markedDate &&
-      date.toDateString() === markedDate.toDateString()
-    );
+    return !!markedDate && date.toDateString() === markedDate.toDateString();
   };
 
   const tileClassName = ({ date }: { date: Date }) => {
