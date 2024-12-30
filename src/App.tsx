@@ -1,14 +1,16 @@
 import React, { useState } from "react";
 
-function App() {
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [responseMessage, setResponseMessage] = useState("");
-  const [uploadStatus, setUploadStatus] = useState("");
+const App: React.FC = () => {
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [responseMessage, setResponseMessage] = useState<string>("");
+  const [uploadStatus, setUploadStatus] = useState<string>("");
 
-  const handleFileChange = (event) => {
-    setSelectedFile(event.target.files[0]);
-    setResponseMessage("");
-    setUploadStatus("");
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files.length > 0) {
+      setSelectedFile(event.target.files[0]);
+      setResponseMessage("");
+      setUploadStatus("");
+    }
   };
 
   const uploadFile = async () => {
@@ -62,12 +64,17 @@ function App() {
         </p>
       )}
       {responseMessage && (
-        <p style={{ marginTop: "10px", color: uploadStatus === "Upload Successful!" ? "green" : "red" }}>
+        <p
+          style={{
+            marginTop: "10px",
+            color: uploadStatus === "Upload Successful!" ? "green" : "red",
+          }}
+        >
           {responseMessage}
         </p>
       )}
     </div>
   );
-}
+};
 
 export default App;
