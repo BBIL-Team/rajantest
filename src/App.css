@@ -1,19 +1,32 @@
-header {
-    background-color:#483d8b;
-    display:flex;
-    align-items: center;
-    color: white;
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f9f9f9;
 }
 
-.logo {
-    height: 120px;
-    margin-right: 20px;
+h1 {
+  color: #333;
 }
 
-.day.green {
-  background-color: lightgreen;
+button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
-.day.red {
-  background-color: lightcoral;
+button:hover {
+  background-color: #0056b3;
+}
+
+input[type="file"] {
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+p {
+  font-size: 16px;
 }
