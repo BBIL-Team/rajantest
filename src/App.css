@@ -30,3 +30,21 @@ input[type="file"] {
 p {
   font-size: 16px;
 }
+.App {
+  font-family: Arial, sans-serif;
+  text-align: center;
+}
+
+.upload-section {
+  margin-bottom: 20px;
+}
+
+.calendar-section {
+  margin-top: 20px;
+}
+
+.success-day {
+  background-color: green !important;
+  color: white !important;
+  border-radius: 50%;
+}
