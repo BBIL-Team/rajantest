@@ -1,78 +1,75 @@
 import React, { useState } from "react";
+import Calendar from "react-calendar";
+import "react-calendar/dist/Calendar.css";
+import "./App.css"; // Optional: Add your own styles if needed
 
 const App: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [responseMessage, setResponseMessage] = useState<string>("");
-  const [uploadStatus, setUploadStatus] = useState<string>("");
+  const [uploadMessage, setUploadMessage] = useState<string | null>(null);
+  const [markedDate, setMarkedDate] = useState<Date | null>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files.length > 0) {
+    if (event.target.files && event.target.files[0]) {
       setSelectedFile(event.target.files[0]);
-      setResponseMessage("");
-      setUploadStatus("");
     }
   };
 
-  const uploadFile = async () => {
+  const handleUpload = async () => {
     if (!selectedFile) {
-      alert("Please select a file before uploading.");
+      setUploadMessage("Please select a file to upload.");
       return;
     }
 
-    const apiUrl = "https://octr9wrn0k.execute-api.ap-south-1.amazonaws.com/s2/rajantestfunction" // Replace with your API Gateway endpoint
-
     try {
-      setUploadStatus("Uploading...");
-      const response = await fetch(apiUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/octet-stream", // Send raw binary data
-          "File-Name": selectedFile.name, // Send file name in headers
-        },
-        body: selectedFile,
-      });
+      const response = await fetch(
+        "https://octr9wrn0k.execute-api.ap-south-1.amazonaws.com/s2/rajantestfunction", // Replace with your Lambda endpoint
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ fileName: selectedFile.name }),
+        }
+      );
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      if (response.ok) {
+        setUploadMessage("File uploaded successfully!");
+        setMarkedDate(new Date()); // Mark the current day as successful
+      } else {
+        setUploadMessage("Upload failed. Please try again.");
       }
-
-      const result = await response.json();
-      setResponseMessage(`Success: ${result.message}`);
-      setUploadStatus("Upload Successful!");
     } catch (error) {
-      console.error("Error during file upload:", error);
-      setResponseMessage("Error: File upload failed.");
-      setUploadStatus("Upload Failed.");
+      setUploadMessage("An error occurred while uploading the file.");
+      console.error(error);
     }
   };
 
+  const isDateMarked = (date: Date): boolean => {
+    return (
+      markedDate &&
+      date.toDateString() === markedDate.toDateString()
+    );
+  };
+
+  const tileClassName = ({ date }: { date: Date }) => {
+    if (isDateMarked(date)) {
+      return "success-day"; // Add a custom class for marked dates
+    }
+    return null;
+  };
+
   return (
-    <div style={{ textAlign: "center", marginTop: "50px" }}>
-      <h1>File Upload Test</h1>
-      <input
-        type="file"
-        onChange={handleFileChange}
-        style={{ marginBottom: "20px" }}
-      />
-      <br />
-      <button onClick={uploadFile} style={{ padding: "10px 20px" }}>
-        Upload File
-      </button>
-      {uploadStatus && (
-        <p style={{ marginTop: "20px", fontWeight: "bold" }}>
-          Status: {uploadStatus}
-        </p>
-      )}
-      {responseMessage && (
-        <p
-          style={{
-            marginTop: "10px",
-            color: uploadStatus === "Upload Successful!" ? "green" : "red",
-          }}
-        >
-          {responseMessage}
-        </p>
-      )}
+    <div className="App">
+      <h1>File Upload and Calendar</h1>
+      <div className="upload-section">
+        <input type="file" onChange={handleFileChange} />
+        <button onClick={handleUpload}>Upload</button>
+        {uploadMessage && <p>{uploadMessage}</p>}
+      </div>
+      <div className="calendar-section">
+        <h2>Upload Calendar</h2>
+        <Calendar tileClassName={tileClassName} />
+      </div>
     </div>
   );
 };
