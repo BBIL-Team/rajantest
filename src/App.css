@@ -45,6 +45,6 @@ p {
 
 .success-day {
   background-color: green !important;
-  color: white !important;
+  color: red !important;
   border-radius: 50%;
 }
