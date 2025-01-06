@@ -22,7 +22,7 @@ const App: React.FC = () => {
 
     try {
       const response = await fetch(
-        "https://w5rtfqjj88.execute-api.ap-south-1.amazonaws.com/default/rajantest12345", // Replace with your Lambda endpoint
+        " https://octr9wrn0k.execute-api.ap-south-1.amazonaws.com/default/rajantestfunction", // Replace with your Lambda endpoint
         {
           method: "POST",
           headers: {
