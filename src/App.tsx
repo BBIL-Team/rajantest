@@ -1,71 +1,86 @@
 import React, { useState } from "react";
-import Calendar from "react-calendar";
-import "react-calendar/dist/Calendar.css";
-import "./App.css"; // Optional: Add your own styles if needed
+
+const months = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
+];
 
 const App: React.FC = () => {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [uploadMessage, setUploadMessage] = useState<string | null>(null);
-  const [markedDate, setMarkedDate] = useState<Date | null>(null);
+  const [selectedMonth, setSelectedMonth] = useState<string>("");
+  const [responseMessage, setResponseMessage] = useState<string>("");
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-      setSelectedFile(event.target.files[0]);
-    }
-  };
-
-  const handleUpload = async () => {
-    if (!selectedFile) {
-      setUploadMessage("Please select a file to upload.");
-      return;
-    }
-
+  const downloadFile = async (month: string) => {
     try {
-      const response = await fetch(
-        " https://octr9wrn0k.execute-api.ap-south-1.amazonaws.com/default/rajantestfunction", // Replace with your Lambda endpoint
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ fileName: selectedFile.name }),
-        }
-      );
-
-      if (response.ok) {
-        setUploadMessage("File uploaded successfully!");
-        setMarkedDate(new Date()); // Mark the current day as successful
+      const response = await fetch("https://e3blv3dko6.execute-api.ap-south-1.amazonaws.com/P1/presigned_urls", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ file_key: `${month}_Sample_File.csv` }),
+      });
+      console.log("Download Response status:", response.status, "OK:", response.ok);
+      console.log("Download Response headers:", Object.fromEntries(response.headers.entries()));
+      const data = await response.json();
+      console.log("Download Response data:", data);
+      if (response.ok && data.presigned_url) {
+        const link = document.createElement("a");
+        link.href = data.presigned_url;
+        link.download = `${month}_Sample_File.csv`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setResponseMessage(`Downloaded ${month}_Sample_File.csv successfully!`);
       } else {
-        setUploadMessage("Upload failed. Please try again.");
+        setResponseMessage(`Error: ${data.error || "Failed to fetch download link"} (Status: ${response.status})`);
       }
-    } catch (error) {
-      setUploadMessage("An error occurred while uploading the file.");
-      console.error(error);
+    } catch (error: any) {
+      console.error("Download error:", error);
+      setResponseMessage(`An error occurred while fetching the download link: ${error.message}`);
     }
-  };
-
-  const isDateMarked = (date: Date): boolean => {
-    return !!markedDate && date.toDateString() === markedDate.toDateString();
-  };
-
-  const tileClassName = ({ date }: { date: Date }) => {
-    if (isDateMarked(date)) {
-      return "success-day"; // Add a custom class for marked dates
-    }
-    return null;
   };
 
   return (
-    <div className="App">
-      <h1>File Upload and Calendar</h1>
-      <div className="upload-section">
-        <input type="file" onChange={handleFileChange} />
-        <button onClick={handleUpload}>Upload</button>
-        {uploadMessage && <p>{uploadMessage}</p>}
-      </div>
-      <div className="calendar-section">
-        <h2>Upload Calendar</h2>
-        <Calendar tileClassName={tileClassName} />
+    <div style={{ padding: "20px", maxWidth: "600px", margin: "0 auto" }}>
+      <h1>Minimal Download App</h1>
+      <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+        <select
+          value={selectedMonth}
+          onChange={(e) => setSelectedMonth(e.target.value)}
+          style={{ padding: "8px", fontSize: "16px" }}
+        >
+          <option value="">Select Month</option>
+          {months.map((month) => (
+            <option key={month} value={month}>
+              {month}
+            </option>
+          ))}
+        </select>
+        <button
+          disabled={!selectedMonth}
+          onClick={() => downloadFile(selectedMonth)}
+          style={{
+            padding: "10px",
+            fontSize: "16px",
+            backgroundColor: selectedMonth ? "#007BFF" : "#ccc",
+            color: "#fff",
+            border: "none",
+            borderRadius: "4px",
+            cursor: selectedMonth ? "pointer" : "not-allowed",
+          }}
+        >
+          Download Sample CSV
+        </button>
+        {responseMessage && (
+          <p
+            style={{
+              marginTop: "10px",
+              color: responseMessage.includes("success") ? "green" : "red",
+              fontSize: "16px",
+            }}
+          >
+            {responseMessage}
+          </p>
+        )}
       </div>
     </div>
   );
